@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Бро-Проекты | IndexedDB 150 МБ</title>
+    <title>Бро-Проекты | Короны разработчикам</title>
     <style>
         body {
-            font-family: system-ui;
+            font-family: system-ui, 'Segoe UI', monospace;
             background: #0b1120;
             color: #e2e8f0;
             padding: 20px;
@@ -16,6 +16,7 @@
             background: #1e293b;
             padding: 20px;
             border-radius: 20px;
+            margin-bottom: 20px;
             text-align: center;
         }
         button {
@@ -25,17 +26,26 @@
             padding: 10px 20px;
             margin: 5px;
             border-radius: 40px;
+            font-weight: bold;
             cursor: pointer;
+            font-size: 14px;
         }
-        .export-btn { background: #10b981; }
-        .change-name-btn { background: #f59e0b; }
-        .dev-btn { background: #8b5cf6; }
+        .export-btn {
+            background: #10b981;
+        }
+        .change-name-btn {
+            background: #f59e0b;
+        }
+        .dev-btn {
+            background: #8b5cf6;
+        }
         .drop-zone {
             border: 3px dashed #3b82f6;
             border-radius: 20px;
             padding: 30px;
             text-align: center;
             margin: 20px 0;
+            transition: all 0.3s;
             background: #1e293b;
         }
         .drop-zone.drag-over {
@@ -49,14 +59,134 @@
             margin-bottom: 20px;
             border-left: 4px solid #10b981;
         }
-        .project-name { font-weight: bold; font-size: 18px; color: #facc15; }
-        .project-desc { color: #94a3b8; margin: 8px 0; background: #0f172a; padding: 8px; border-radius: 12px; }
-        .download-btn { background: #3b82f6; padding: 8px 16px; text-decoration: none; color: white; border-radius: 40px; display: inline-block; }
-        .delete-btn { background: #ef4444; padding: 8px 12px; margin-left: 10px; border: none; border-radius: 40px; color: white; cursor: pointer; }
-        .user-info { background: #0f172a; padding: 8px 15px; border-radius: 40px; display: inline-block; margin-bottom: 10px; }
-        .dev-badge { background: #ec489a; padding: 2px 8px; border-radius: 20px; font-size: 10px; margin-left: 8px; }
-        input[type="file"] { display: none; }
-        .total-size { font-size: 12px; color: #64748b; margin-top: 10px; text-align: center; }
+        .project-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: #facc15;
+        }
+        .project-desc {
+            color: #94a3b8;
+            margin: 8px 0;
+            font-style: italic;
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+        .project-meta {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .download-btn {
+            background: #3b82f6;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: white;
+            border-radius: 40px;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .delete-btn {
+            background: #ef4444;
+            padding: 8px 12px;
+            margin-left: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+        }
+        .delete-disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .comments-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #334155;
+        }
+        .comments-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        .comment {
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .comment-author {
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .comment-text {
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .comment-time {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .add-comment {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .comment-input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 40px;
+            border: none;
+            background: #334155;
+            color: white;
+            font-family: inherit;
+        }
+        .send-comment-btn {
+            background: #3b82f6;
+            padding: 8px 16px;
+            margin: 0;
+        }
+        .status {
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            background: #0f172a;
+            padding: 8px 15px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .dev-badge {
+            background: #ec489a;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+        .crown {
+            font-size: 14px;
+            margin-right: 4px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .total-size {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +207,7 @@
     📁 **Перетащи файл сюда** (максимум 150 МБ)
 </div>
 
-<div id="projectList">📡 Загрузка...</div>
+<div id="projectList" class="status">📡 Загрузка проектов...</div>
 <div class="total-size" id="totalSize"></div>
 
 <script>
@@ -91,6 +221,23 @@
     const DEV_KEY = 'brosisdev';
     
     let db = null;
+
+    // 🔥 Функция для отображения имени с короной (если разработчик)
+    function formatAuthorName(name, isDevUser) {
+        if (isDevUser) {
+            return `<span class="crown">👑</span> ${escapeHtml(name)}`;
+        }
+        return escapeHtml(name);
+    }
+
+    // Получить имя с короной для текущего пользователя (в шапке)
+    function getDisplayName() {
+        const name = getUserName();
+        if (isDev()) {
+            return `<span class="crown">👑</span> ${escapeHtml(name)}`;
+        }
+        return escapeHtml(name);
+    }
 
     function getUserName() {
         let name = localStorage.getItem(USER_NAME_KEY);
@@ -107,18 +254,16 @@
 
     function becomeDev() {
         if (isDev()) { alert("Ты уже разработчик!"); return; }
-        const password = prompt("🔐 Введи пароль:", "");
+        const password = prompt("🔐 Введи пароль разработчика:", "");
         if (password === "88198199") {
             localStorage.setItem(DEV_KEY, 'true');
             updateUserDisplay();
-            alert("✅ Ты разработчик!");
+            alert("✅ Ты разработчик! 👑 Теперь везде будет корона.");
         } else if (password) alert("❌ Неверный пароль.");
     }
 
     function updateUserDisplay() {
-        const name = getUserName();
-        const dev = isDev();
-        document.getElementById('userInfo').innerHTML = dev ? `👑 ${name} <span class="dev-badge">РАЗРАБОТЧИК</span>` : `👤 ${name}`;
+        document.getElementById('userInfo').innerHTML = getDisplayName();
     }
 
     function changeUserName() {
@@ -158,7 +303,6 @@
     async function saveProject(project) {
         if (!db) db = await openDatabase();
         
-        // Проверка общего размера
         const projects = await getProjects();
         let totalSize = 0;
         for (const p of projects) totalSize += p.size || 0;
@@ -204,6 +348,7 @@
                 size: file.size,
                 data: e.target.result,
                 author: getUserName(),
+                isAuthorDev: isDev(),
                 description: description,
                 timestamp: Date.now(),
                 comments: []
@@ -224,6 +369,7 @@
             if (!project.comments) project.comments = [];
             project.comments.push({
                 author: getUserName(),
+                isAuthorDev: isDev(),
                 text: commentText.trim(),
                 timestamp: Date.now()
             });
@@ -251,6 +397,7 @@
         const projects = await getProjects();
         const container = document.getElementById('projectList');
         const currentUser = getUserName();
+        const currentUserIsDev = isDev();
         
         if (projects.length === 0) {
             container.innerHTML = '😢 Проектов нет. Нажми «ЭКСПОРТ» или перетащи файл.';
@@ -263,21 +410,41 @@
         for (const proj of projects) {
             totalSize += proj.size || 0;
             const userCanDelete = isDev() || proj.author === currentUser;
-            const deleteClass = userCanDelete ? 'delete-btn' : 'delete-btn';
-            const authorDisplay = proj.author === currentUser ? `${escapeHtml(proj.author)} (это ты)` : escapeHtml(proj.author);
+            const deleteClass = userCanDelete ? 'delete-btn' : 'delete-btn delete-disabled';
+            
+            // 🔥 Отображение автора проекта с короной (если разработчик)
+            const isAuthorDev = proj.isAuthorDev || false;
+            let authorDisplay = '';
+            if (isAuthorDev) {
+                authorDisplay = `<span class="crown">👑</span> ${escapeHtml(proj.author)}`;
+            } else {
+                authorDisplay = escapeHtml(proj.author);
+            }
+            
+            if (proj.author === currentUser) {
+                authorDisplay += ` (это ты)`;
+            }
             
             let commentsHtml = '';
             if (proj.comments && proj.comments.length > 0) {
-                commentsHtml = `<div style="margin-top:10px;"><b>💬 Комментарии:</b></div>`;
-                proj.comments.forEach(comment => {
+                commentsHtml = `<div class="comments-title">💬 Комментарии (${proj.comments.length}):</div>`;
+                for (const comment of proj.comments) {
+                    // 🔥 Отображение автора комментария с короной (если разработчик)
+                    let commentAuthorDisplay = '';
+                    if (comment.isAuthorDev) {
+                        commentAuthorDisplay = `<span class="crown">👑</span> ${escapeHtml(comment.author)}`;
+                    } else {
+                        commentAuthorDisplay = escapeHtml(comment.author);
+                    }
+                    
                     commentsHtml += `
-                        <div style="background:#0f172a; padding:8px; border-radius:12px; margin-top:5px;">
-                            <span style="color:#facc15;">${escapeHtml(comment.author)}</span><br>
-                            <span style="font-size:13px;">${escapeHtml(comment.text)}</span><br>
-                            <span style="font-size:10px; color:#64748b;">${new Date(comment.timestamp).toLocaleString()}</span>
+                        <div class="comment">
+                            <div class="comment-author" style="color: #facc15;">${commentAuthorDisplay}</div>
+                            <div class="comment-text">${escapeHtml(comment.text)}</div>
+                            <div class="comment-time">${new Date(comment.timestamp).toLocaleString()}</div>
                         </div>
                     `;
-                });
+                }
             }
             
             html += `
@@ -287,12 +454,14 @@
                     <div class="project-meta">📦 ${(proj.size / 1024 / 1024).toFixed(2)} МБ • 👤 ${authorDisplay} • 🕒 ${new Date(proj.timestamp).toLocaleString()}</div>
                     <div>
                         <a class="download-btn" href="${proj.data}" download="${escapeHtml(proj.name)}">⬇️ Скачать</a>
-                        <button class="${deleteClass}" onclick="deleteProjectById(${proj.id}, '${proj.author}')">🗑️ Удалить</button>
+                        <button class="${deleteClass}" onclick="deleteProjectById(${proj.id}, '${proj.author.replace(/'/g, "\\'")}')">🗑️ Удалить</button>
                     </div>
-                    ${commentsHtml}
-                    <div style="margin-top:10px;">
-                        <input type="text" id="comment-${proj.id}" placeholder="Напиши комментарий..." style="padding:8px; border-radius:20px; border:none; width:70%;">
-                        <button onclick="addComment(${proj.id}, document.getElementById('comment-${proj.id}').value)">📝 Отправить</button>
+                    <div class="comments-section">
+                        ${commentsHtml}
+                        <div class="add-comment">
+                            <input type="text" class="comment-input" id="comment-${proj.id}" placeholder="Напиши комментарий...">
+                            <button class="send-comment-btn" onclick="addComment(${proj.id}, document.getElementById('comment-${proj.id}').value)">📝 Отправить</button>
+                        </div>
                     </div>
                 </div>
             `;
