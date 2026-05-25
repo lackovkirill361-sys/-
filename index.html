@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Бро-Проекты | Мультиплеер</title>
+    <style>
+        body {
+            font-family: system-ui, 'Segoe UI', monospace;
+            background: #0b1120;
+            color: #e2e8f0;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        button {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .export-btn {
+            background: #10b981;
+        }
+        .change-name-btn {
+            background: #f59e0b;
+        }
+        .dev-btn {
+            background: #8b5cf6;
+        }
+        .project-card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+        .project-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: #facc15;
+        }
+        .project-desc {
+            color: #94a3b8;
+            margin: 8px 0;
+            font-style: italic;
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+        .project-meta {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .download-btn {
+            background: #3b82f6;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: white;
+            border-radius: 40px;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .delete-btn {
+            background: #ef4444;
+            padding: 8px 12px;
+            margin-left: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+        }
+        .delete-disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .comments-section {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #334155;
+        }
+        .comments-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        .comment {
+            background: #0f172a;
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .comment-author {
+            color: #facc15;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .comment-text {
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        .comment-time {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .add-comment {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .comment-input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 40px;
+            border: none;
+            background: #334155;
+            color: white;
+            font-family: inherit;
+        }
+        .comment-input::placeholder {
+            color: #94a3b8;
+        }
+        .send-comment-btn {
+            background: #3b82f6;
+            padding: 8px 16px;
+            margin: 0;
+        }
+        .status {
+            background: #1e293b;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            background: #0f172a;
+            padding: 8px 15px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .dev-badge {
+            background: #ec489a;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📦 Бро-Проекты(godot,покет коды,newcatroid,и другое)</h1>
+    <div class="user-info" id="userInfo">👤 Загрузка...</div>
+    <div>
+        <button class="change-name-btn" id="changeNameBtn">✏️ Сменить имя</button>
+        <button class="dev-btn" id="devBtn">🔐 Стать разработчиком</button>
+        <button class="export-btn" id="exportBtn">📤 ЭКСПОРТ</button>
+        <button id="refreshBtn">🔄 Обновить</button>
+    </div>
+    <input type="file" id="fileInput">
+</div>
+
+<div id="projectList" class="status">📡 Загрузка проектов...</div>
+
+<script>
+    const STORAGE_KEY = 'bromultiprojects_comments';
+    const USER_NAME_KEY = 'brousername';
+    const DEV_KEY = 'brosisdev';
+
+    function getUserName() {
+        let name = localStorage.getItem(USER_NAME_KEY);
+        if (!name) {
+            name = prompt("👋 Привет, бро! Введи своё имя (один раз):", "Бро") || "Аноним";
+            localStorage.setItem(USER_NAME_KEY, name);
+        }
+        return name;
+    }
+
+    function isDev() {
+        return localStorage.getItem(DEV_KEY) === 'true';
+    }
+
+    function becomeDev() {
+        if (isDev()) {
+            alert("⚠️ Ты уже разработчик, бро!");
+            return;
+        }
+        const password = prompt("🔐 Введи пароль разработчика:", "");
+        if (password === "88198199") {
+            localStorage.setItem(DEV_KEY, 'true');
+            updateUserDisplay();
+            alert("✅ Поздравляю, бро! Ты теперь разработчик. Можешь удалять любые проекты.");
+        } else if (password !== null) {
+            alert("❌ Неверный пароль, бро. Доступ запрещён.");
+        }
+    }
+
+    function updateUserDisplay() {
+        const name = getUserName();
+        const dev = isDev();
+        const userInfoDiv = document.getElementById('userInfo');
+        if (dev) {
+            userInfoDiv.innerHTML = `👑 ${name} <span class="dev-badge">РАЗРАБОТЧИК</span>`;
+        } else {
+            userInfoDiv.innerHTML = `👤 ${name}`;
+        }
+    }
+
+    function changeUserName() {
+        const newName = prompt("✏️ Введи новое имя:", getUserName());
+        if (newName && newName.trim()) {
+            localStorage.setItem(USER_NAME_KEY, newName.trim());
+            updateUserDisplay();
+            alert(`✅ Теперь ты ${newName}`);
+        }
+    }
+
+    function getProjects() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+        return [];
+    }
+
+    function saveProjects(projects) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+    }
+
+    function addComment(projectIndex, commentText) {
+        const projects = getProjects();
+        if (projectIndex >= 0 && projectIndex < projects.length && commentText.trim()) {
+            const project = projects[projectIndex];
+            if (!project.comments) {
+                project.comments = [];
+            }
+            project.comments.push({
+                author: getUserName(),
+                text: commentText.trim(),
+                timestamp: Date.now()
+            });
+            saveProjects(projects);
+            renderProjects();
+        }
+    }
+
+    // 🔥 НОВАЯ ЛОГИКА УДАЛЕНИЯ 🔥
+    function canDeleteProject(project) {
+        const currentUser = getUserName();
+        const dev = isDev();
+        // Разработчик может удалить всё
+        if (dev) return true;
+        // Автор может удалить свой проект
+        if (project.author === currentUser) return true;
+        // Остальные не могут
+        return false;
+    }
+
+    function deleteProject(index) {
+        const projects = getProjects();
+        if (index >= 0 && index < projects.length) {
+            const project = projects[index];
+            const projectName = project.name;
+            
+            if (canDeleteProject(project)) {
+                const isAuthor = project.author === getUserName();
+                const isDeveloper = isDev();
+                let message = `🗑️ Удалить проект "${projectName}"?`;
+                if (isDeveloper && !isAuthor) {
+                    message = `🔐 Ты разработчик. Удалить чужой проект "${projectName}"?`;
+                }
+                if (confirm(message)) {
+                    projects.splice(index, 1);
+                    saveProjects(projects);
+                    renderProjects();
+                    alert(`✅ Проект "${projectName}" удалён.`);
+                }
+            } else {
+                alert(`❌ Ты не можешь удалить проект "${projectName}".\n\nУдалять могут только:\n- Автор проекта (${project.author})\n- Разработчик (с паролем)`);
+            }
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function formatTime(timestamp) {
+        return new Date(timestamp).toLocaleString();
+    }
+
+    function renderProjects() {
+        const container = document.getElementById('projectList');
+        const projects = getProjects();
+        const currentUser = getUserName();
+        const dev = isDev();
+        
+        if (projects.length === 0) {
+            container.innerHTML = '😢 Проектов пока нет. Нажми «Экспорт», чтобы добавить первый!';
+            return;
+        }
+        
+        let html = '<div style="margin-bottom: 10px;">📁 <strong>Доступные проекты (' + projects.length + '):</strong></div>';
+        
+        projects.forEach((proj, index) => {
+            // Проверяем, может ли текущий пользователь удалить этот проект
+            const userCanDelete = canDeleteProject(proj);
+            const deleteButtonClass = userCanDelete ? 'delete-btn' : 'delete-btn delete-disabled';
+            const deleteButtonDisabled = userCanDelete ? '' : 'disabled';
+            
+            // Комментарии
+            let commentsHtml = '';
+            if (proj.comments && proj.comments.length > 0) {
+                commentsHtml = '<div class="comments-title">💬 Комментарии (' + proj.comments.length + '):</div>';
+                proj.comments.forEach(comment => {
+                    commentsHtml += `
+                        <div class="comment">
+                            <div class="comment-author">${escapeHtml(comment.author)}</div>
+                            <div class="comment-text">${escapeHtml(comment.text)}</div>
+                            <div class="comment-time">${formatTime(comment.timestamp)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // Показываем авторство с пометкой, если это текущий пользователь
+            const authorDisplay = proj.author === currentUser ? `${escapeHtml(proj.author)} (это ты)` : escapeHtml(proj.author);
+            
+            html += `
+                <div class="project-card">
+                    <div class="project-name">📄 ${escapeHtml(proj.name)}</div>
+                    <div class="project-desc">📝 ${escapeHtml(proj.description || 'Без описания')}</div>
+                    <div class="project-meta">
+                        📦 ${proj.size} байт • 👤 загрузил: ${authorDisplay} • 🕒 ${formatTime(proj.timestamp)}
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <a class="download-btn" href="${proj.data}" download="${escapeHtml(proj.name)}">⬇️ Скачать</a>
+                        <button class="${deleteButtonClass}" data-index="${index}" ${deleteButtonDisabled}>🗑️ Удалить</button>
+                    </div>
+                    
+                    <div class="comments-section">
+                        ${commentsHtml}
+                        <div class="add-comment">
+                            <input type="text" class="comment-input" id="comment-input-${index}" placeholder="Напиши комментарий...">
+                            <button class="send-comment-btn" data-index="${index}">📝 Отправить</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Обработчики удаления (только если кнопка активна)
+        document.querySelectorAll('.delete-btn:not(.delete-disabled)').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                deleteProject(idx);
+            });
+        });
+        
+        // Обработчики отправки комментариев
+        document.querySelectorAll('.send-comment-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                const input = document.getElementById(`comment-input-${idx}`);
+                const commentText = input.value;
+                if (commentText.trim()) {
+                    addComment(idx, commentText);
+                    input.value = '';
+                } else {
+                    alert("✏️ Напиши что-нибудь, бро!");
+                }
+            });
+        });
+        
+        // Отправка комментария по Enter
+        document.querySelectorAll('.comment-input').forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const idx = parseInt(input.id.split('-').pop());
+                    const commentText = input.value;
+                    if (commentText.trim()) {
+                        addComment(idx, commentText);
+                        input.value = '';
+                    }
+                }
+            });
+        });
+    }
+
+    // Экспорт файла
+    document.getElementById('exportBtn').addEventListener('click', () => {
+        document.getElementById('fileInput').click();
+    });
+    
+    document.getElementById('fileInput').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const author = getUserName();
+            const description = prompt("📝 Введи описание проекта:", "Мой крутой проект") || "Без описания";
+            
+            const projects = getProjects();
+            projects.push({
+                name: file.name,
+                size: file.size,
+                data: e.target.result,
+                author: author,
+                description: description,
+                timestamp: Date.now(),
+                comments: []
+            });
+            saveProjects(projects);
+            renderProjects();
+            alert(`✅ Проект "${file.name}" добавлен!`);
+        };
+        reader.readAsDataURL(file);
+        document.getElementById('fileInput').value = '';
+    });
+    
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        renderProjects();
+    });
+    
+    document.getElementById('changeNameBtn').addEventListener('click', () => {
+        changeUserName();
+    });
+    
+    document.getElementById('devBtn').addEventListener('click', () => {
+        becomeDev();
+    });
+    
+    // Инициализация
+    updateUserDisplay();
+    renderProjects();
+    setInterval(() => {
+        renderProjects();
+    }, 10000);
+</script>
+
+</body>
+</html>
